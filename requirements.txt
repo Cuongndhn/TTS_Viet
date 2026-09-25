@@ -15,5 +15,5 @@ soxr                    # resample chất lượng cao (dự phòng)
 # Bao gồm: onnxruntime, tokenizers, sea-g2p, huggingface_hub, librosa...
 vieneu>=3.8
 
-# Tùy chọn: xuất MP3 (cần thêm ffmpeg cài ngoài)
-# pydub
+# Tùy chọn: xuất MP3 (cần thêm ffmpeg: trên Docker đã có sẵn trong image)
+pydub

@@ -181,6 +181,13 @@ from pydantic import BaseModel
 app = FastAPI(title="VieNeu TTS Web", version="1.0")
 
 
+@app.on_event("startup")
+def _startup_preload():
+    """Tự nạp model nền khi server khởi động (quan trọng khi chạy Docker
+    bằng `uvicorn app:app`, vì nhánh `__main__` không được thực thi)."""
+    preload_in_background()
+
+
 class TTSRequest(BaseModel):
     """Body JSON cho POST /api/tts."""
     text: str                    # văn bản tiếng Việt (tối đa 20.000 ký tự)

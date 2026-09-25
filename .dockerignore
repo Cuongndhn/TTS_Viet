@@ -1,0 +1,7 @@
+# Docker build context: loai file nang / khong can thiet
+.git/
+__pycache__/
+.venv/
+VieNeu-TTS-source/
+outputs/*.wav
+outputs/*.mp3

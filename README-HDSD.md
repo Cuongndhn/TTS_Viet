@@ -16,6 +16,9 @@ TTS_Viet/
 │   ├── style.css           # CSS riêng (kết hợp Tailwind CDN)
 │   └── app.js              # JS gọi API, audio player, lịch sử
 ├── outputs/                # File .wav đã tạo (tự sinh)
+├── Dockerfile              # Đóng gói chạy Docker (Python 3.12 + ffmpeg)
+├── docker-compose.yml      # Chạy 1 lệnh: docker compose up -d
+├── .dockerignore           # Loại file nặng khỏi image
 ├── VieNeu-TTS-source/      # Source engine gốc đã clone từ GitHub (tham khảo)
 └── README-HDSD.md          # File này
 ```
@@ -99,5 +102,19 @@ Mẹo cảm xúc (thử nghiệm): chèn `[cười]`, `[thở dài]`, `[hắng g
 | `kaldi-native-fbank` build lỗi trên Windows | Dùng Python 3.10–3.12 ổn định hơn 3.14; hoặc `pip install vieneu --no-deps` + cài tay `onnxruntime soundfile soxr tokenizers huggingface_hub` |
 | Cổng 8000 bận | Đổi port: `uvicorn app:app --port 8001` |
 
+## 🐳 Chạy bằng Docker (khuyên dùng — đủ voice cloning + MP3)
+
+Yêu cầu: đã cài **Docker Desktop**. Trong thư mục project:
+
+```bat
+docker compose up -d --build
+```
+
+- Mở **http://localhost:8000** để dùng.
+- Lần đầu container tự nạp model (dùng chung cache `~/.cache/huggingface` trên máy nên nhanh).
+- Xem log: `docker compose logs -f` • Dừng: `docker compose down` • Chạy lại: `docker compose up -d`
+- File wav tạo ra nằm ở `./outputs` trên máy host.
+- Bản Docker dùng Python 3.12 nên có đủ `kaldi-native-fbank` (voice cloning) và `ffmpeg` (xuất MP3).
+
 ## 📜 Bản quyền
-Engine © Phạm Nguyễn Ngọc Bảo — Apache-2.0. Web này chỉ là giao diện minh họa调用 SDK `vieneu`.
+Engine © Phạm Nguyễn Ngọc Bảo — Apache-2.0. Web này là giao diện minh họa gọi SDK `vieneu`.

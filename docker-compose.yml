@@ -1,0 +1,32 @@
+# =====================================================================
+# VieNeu TTS Web — docker-compose.yml
+# Chạy:  docker compose up -d --build   (lần đầu tải model ~1-3GB, chờ lâu)
+# Xem:   http://localhost:8000
+# Log:   docker compose logs -f
+# Dừng:  docker compose down
+# =====================================================================
+services:
+  tts-web:
+    build: .
+    image: tts-viet:latest
+    container_name: vieneu-tts-web
+    ports:
+      - "8000:8000"
+    environment:
+      # Bản int8 chạy nhanh hơn trên CPU hỗ trợ VNNI; CPU cũ để fp32
+      - VIENEU_PRECISION=fp32
+    volumes:
+      # Cache model HuggingFace: tải 1 lần, giữ lại giữa các lần chạy.
+      # Dùng chung cache đã tải sẵn trên máy Windows (đỡ tải lại ~1.2GB):
+      - type: bind
+        source: ${USERPROFILE}/.cache/huggingface
+        target: /root/.cache/huggingface
+      # File wav tạo ra nằm ở ./outputs trên máy host
+      - ./outputs:/app/outputs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,json;print(json.load(urllib.request.urlopen('http://127.0.0.1:8000/api/health',timeout=10))['status'])"]
+      interval: 30s
+      timeout: 15s
+      retries: 40
+      start_period: 120s
