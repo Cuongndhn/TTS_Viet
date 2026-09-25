@@ -1,0 +1,99 @@
+/* =====================================================================
+   VieNeu TTS Web — style.css
+   - Giao diện chuyên nghiệp, thân thiện, hỗ trợ tiếng Việt
+   - Kết hợp với TailwindCDN (Tailwind lo bố cục, file này lo màu/chi tiết)
+===================================================================== */
+:root{
+  --bg:#f4f7fb; --card:#ffffff; --ink:#16233a; --muted:#64748b;
+  --brand:#2563eb; --brand2:#06b6d4; --ok:#16a34a; --warn:#f59e0b; --err:#dc2626;
+  --radius:18px; --shadow:0 12px 32px rgba(37,99,235,.10);
+}
+*{box-sizing:border-box}
+body{font-family:"Be Vietnam Pro",system-ui,sans-serif;background:var(--bg);color:var(--ink);margin:0}
+a{color:var(--brand);text-decoration:none} a:hover{text-decoration:underline}
+
+/* Nền blob trang trí */
+.bg-blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.28;z-index:-1}
+.b1{width:420px;height:420px;background:#bfdbfe;top:-120px;left:-120px}
+.b2{width:380px;height:380px;background:#a5f3fc;bottom:-120px;right:-80px}
+.b3{width:260px;height:260px;background:#fbcfe8;top:40%;left:60%}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 18px}
+.topbar{background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid #e5eaf2;position:sticky;top:0;z-index:10}
+.topbar-in{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;gap:12px;flex-wrap:wrap}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{font-size:38px;background:linear-gradient(135deg,var(--brand),var(--brand2));width:56px;height:56px;display:grid;place-items:center;border-radius:16px;box-shadow:var(--shadow)}
+.brand h1{font-size:20px;margin:0;font-weight:800}
+.badge{font-size:11px;background:#e0ecff;color:#1d4ed8;padding:3px 8px;border-radius:999px;font-weight:700;vertical-align:middle}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+
+/* Đèn trạng thái model */
+.status{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5eaf2;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--warn)}
+.dot.ok{background:var(--ok)} .dot.err{background:var(--err)}
+.dot.pulse{animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.4}}
+
+/* Bố cục 2 cột */
+.grid{display:grid;grid-template-columns:1.6fr .9fr;gap:18px;padding:20px 18px 10px}
+@media(max-width:920px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid #e6ebf3;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.card h2{font-size:16px;margin:0 0 10px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.count{font-size:12px;color:var(--muted)}
+
+/* Ô nhập văn bản */
+textarea{width:100%;border:1.5px solid #dbe3ef;border-radius:14px;padding:14px;font-size:15px;line-height:1.6;resize:vertical;font-family:inherit}
+textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+.row{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.lbl{font-size:13px;color:var(--muted);font-weight:600}
+.chip{border:1px solid #dbe3ef;background:#f8fafc;border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer;font-weight:600}
+.chip:hover{border-color:var(--brand);color:var(--brand);background:#eff6ff}
+.chip.ghost{background:transparent}
+.chip.tag{background:#fff7ed;border-color:#fed7aa}
+
+/* Tùy chọn giọng / slider */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media(max-width:640px){.opts{grid-template-columns:1fr}}
+.opt label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
+.opt small.hint,.hint{color:var(--muted);font-size:12px}
+select,input[type=text]{width:100%;border:1.5px solid #dbe3ef;border-radius:12px;padding:10px 12px;font-size:14px;font-family:inherit;background:#fff}
+input[type=range]{width:100%;accent-color:var(--brand)}
+
+/* Nút bấm */
+.actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn{border:1px solid #dbe3ef;background:#fff;border-radius:12px;padding:12px 18px;font-weight:800;font-size:14px;cursor:pointer}
+.btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border:none;box-shadow:var(--shadow)}
+.btn.primary:disabled{opacity:.6;cursor:wait}
+.btn.secondary{background:#0f172a;color:#fff;border:none}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* Thông báo + trình phát */
+.msg{margin-top:12px;padding:12px 14px;border-radius:12px;font-size:14px}
+.msg.ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+.msg.err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.msg.info{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.hidden{display:none!important}
+.player{margin-top:14px;background:#f8fafc;border:1px solid #e5eaf2;border-radius:14px;padding:12px}
+.player audio{width:100%}
+.player .meta{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* Voice cloning */
+.clone{margin-top:14px;border:1px dashed #cbd5e1;border-radius:14px;padding:12px;background:#fcfdff}
+.clone summary{cursor:pointer;font-weight:700}
+.clone-grid{display:grid;gap:10px;margin-top:10px}
+.denoise{font-size:13px;display:flex;gap:8px;align-items:center}
+
+/* Cột phải */
+.side{display:grid;gap:18px;align-content:start}
+.info{margin:0;padding-left:18px;font-size:13.5px;line-height:1.7;color:#334155}
+.steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.steps div{background:#f1f5ff;border:1px solid #dbeafe;border-radius:12px;padding:10px;text-align:center;font-size:12px;font-weight:600}
+.steps b{display:block;font-size:18px;color:var(--brand)}
+.history{display:grid;gap:8px;max-height:380px;overflow:auto}
+.hist-item{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid #e5eaf2;border-radius:12px;padding:8px 10px;font-size:13px;background:#fff}
+.hist-item audio{width:100%;margin-top:6px}
+.hist-item .h-act{display:flex;gap:6px}
+.hist-item button{border:1px solid #dbe3ef;background:#f8fafc;border-radius:8px;padding:5px 9px;cursor:pointer;font-size:12px}
+.empty{color:var(--muted);font-size:13px}
+.foot{padding:18px;color:var(--muted);font-size:12.5px;text-align:center}

@@ -1,0 +1,19 @@
+# =====================================================================
+# VieNeu TTS Web — danh sách thư viện (cài: pip install -r requirements.txt)
+# =====================================================================
+# Web server
+fastapi>=0.115          # framework API backend
+uvicorn[standard]>=0.30 # server ASGI chạy app.py
+python-multipart>=0.0.9 # nhận file upload (voice cloning)
+
+# Xử lý âm thanh
+numpy                   # mảng số liệu audio
+soundfile               # đọc/ghi file .wav 48kHz
+soxr                    # resample chất lượng cao (dự phòng)
+
+# Engine TTS chính (tự tải model pnnbao-ump/VieNeu-TTS-v3-Turbo khi chạy)
+# Bao gồm: onnxruntime, tokenizers, sea-g2p, huggingface_hub, librosa...
+vieneu>=3.8
+
+# Tùy chọn: xuất MP3 (cần thêm ffmpeg cài ngoài)
+# pydub

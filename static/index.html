@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<!-- =====================================================================
+  VieNeu TTS Web — Frontend (HTML + TailwindCSS + JS thuần)
+  - Ô textarea nhập tiếng Việt, chọn giọng, slider Tốc độ/Cao độ
+  - Nút Chuyển đổi → gọi POST /api/tts, Audio player nghe ngay, nút Tải xuống
+  - Chạy cùng backend FastAPI: mở http://127.0.0.1:8000 là thấy trang này
+====================================================================== -->
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VieNeu TTS — Chuyển văn bản thành giọng nói tiếng Việt</title>
+<meta name="description" content="Web TTS tiếng Việt dùng engine VieNeu-TTS v3 Turbo: 25 giọng, voice cloning, 48kHz." />
+<!-- TailwindCSS qua CDN cho nhanh + font tiếng Việt -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+<script>
+  // Cấu hình nhanh màu chủ đạo cho Tailwind
+  tailwind.config = { theme: { extend: { fontFamily: { sans: ['"Be Vietnam Pro"','system-ui','sans-serif'] } } } };
+</script>
+</head>
+<body class="min-h-screen">
+<div class="bg-blob b1"></div><div class="bg-blob b2"></div><div class="bg-blob b3"></div>
+
+<!-- ===== Thanh đầu trang: logo + trạng thái model ===== -->
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <div class="brand">
+      <div class="logo">🦜</div>
+      <div>
+        <h1>VieNeu TTS <span class="badge">v3 Turbo • 48kHz</span></h1>
+        <p>Chuyển văn bản thành giọng nói tiếng Việt • Engine <a href="https://github.com/pnnbao97/VieNeu-TTS" target="_blank" rel="noopener">pnnbao97/VieNeu-TTS</a></p>
+      </div>
+    </div>
+    <!-- Đèn trạng thái: JS cập nhật từ GET /api/health -->
+    <div class="status" id="modelStatus"><span class="dot pulse"></span><span id="modelStatusText">Đang kiểm tra model…</span></div>
+  </div>
+</header>
+
+<main class="wrap grid">
+  <!-- ================= CỘT TRÁI: nhập liệu + điều khiển ================= -->
+  <section class="card">
+    <div class="card-head">
+      <h2>📝 Văn bản cần đọc</h2>
+      <div class="count"><span id="charCount">0</span>/20.000 ký tự <span id="estTime"></span></div>
+    </div>
+
+    <!-- 1) Ô nhập văn bản rộng rãi -->
+    <textarea id="textInput" rows="9" maxlength="20000"
+      placeholder="Nhập hoặc dán văn bản tiếng Việt vào đây…&#10;&#10;Mẹo cảm xúc (thử nghiệm): chèn [cười], [thở dài], [hắng giọng] giữa câu.&#10;Ví dụ: Nghe hay quá đi [cười]. Để mình kể tiếp nhé."></textarea>
+
+    <!-- Nút văn bản mẫu + chèn tag cảm xúc -->
+    <div class="row wrap-btns">
+      <button class="chip" data-sample="tin">📰 Mẫu tin tức</button>
+      <button class="chip" data-sample="truyen">📖 Mẫu kể chuyện</button>
+      <button class="chip" data-sample="qc">📢 Mẫu quảng cáo</button>
+      <button class="chip" data-sample="camxuc">😄 Mẫu cảm xúc</button>
+    </div>
+    <div class="row wrap-btns">
+      <span class="lbl">Chèn cảm xúc:</span>
+      <button class="chip tag" data-tag="[cười]">[cười]</button>
+      <button class="chip tag" data-tag="[thở dài]">[thở dài]</button>
+      <button class="chip tag" data-tag="[hắng giọng]">[hắng giọng]</button>
+      <button class="chip ghost" id="btnClear">🗑 Xóa</button>
+    </div>
+
+    <!-- 2) Tùy chọn cấu hình: giọng / tốc độ / cao độ / độ tự nhiên -->
+    <div class="opts">
+      <div class="opt">
+        <label for="voiceSelect">🎙 Giọng đọc (<span id="voiceCount">…</span>)</label>
+        <select id="voiceSelect"><option>Đang tải danh sách giọng…</option></select>
+        <small class="hint">⭐ là giọng tuyển chọn. Đủ 3 miền Bắc/Trung/Nam, nam/nữ.</small>
+      </div>
+      <!-- Thanh trượt tốc độ đọc -->
+      <div class="opt small">
+        <label for="speedRange">⏩ Tốc độ đọc (Speed): <b id="speedVal">1.00x</b></label>
+        <input type="range" id="speedRange" min="0.5" max="1.5" step="0.05" value="1" />
+        <small class="hint">0.5x chậm rãi • 1.0x chuẩn • 1.5x nhanh</small>
+      </div>
+      <!-- Thanh trượt cao độ -->
+      <div class="opt small">
+        <label for="pitchRange">🎵 Cao độ (Pitch): <b id="pitchVal">0</b></label>
+        <input type="range" id="pitchRange" min="-6" max="6" step="1" value="0" />
+        <small class="hint">-6 trầm • 0 gốc • +6 cao</small>
+      </div>
+      <div class="opt small">
+        <label for="tempRange">🎚 Độ tự nhiên: <b id="tempVal">0.8</b></label>
+        <input type="range" id="tempRange" min="0.3" max="1.2" step="0.05" value="0.8" />
+      </div>
+      <div class="opt small">
+        <label for="playRate">🔈 Tốc độ nghe thử (trình phát): <b id="playRateVal">1.0x</b></label>
+        <input type="range" id="playRate" min="0.5" max="1.5" step="0.05" value="1" />
+      </div>
+    </div>
+
+    <!-- 3) Nút Chuyển đổi + Tải xuống -->
+    <div class="actions">
+      <button id="btnGen" class="btn primary">🎤 Chuyển đổi (Speak)</button>
+      <button id="btnDownloadWav" class="btn" disabled>⬇️ Tải WAV</button>
+      <button id="btnDownloadMp3" class="btn" disabled>⬇️ Tải MP3</button>
+    </div>
+    <div id="msg" class="msg hidden"></div>
+
+    <!-- 4) Trình phát âm thanh nghe trực tiếp -->
+    <div class="player hidden" id="playerBox">
+      <audio id="audio" controls preload="metadata"></audio>
+      <div class="meta"><span id="audioMeta"></span></div>
+    </div>
+
+    <!-- Mở rộng: voice cloning từ file mẫu -->
+    <details class="clone">
+      <summary>🧬 Voice cloning — nhân bản giọng từ file mẫu 3–8 giây</summary>
+      <div class="clone-grid">
+        <input type="file" id="refAudio" accept=".wav,.mp3,.flac,.ogg,.m4a" />
+        <input type="text" id="cloneName" placeholder="Tên giọng để lưu (tùy chọn, vd: Giọng của tôi)" />
+        <label class="denoise"><input type="checkbox" id="denoise" checked /> Tự động khử nhiễu file mẫu</label>
+        <p class="hint">Dùng chung ô văn bản ở trên rồi bấm nút dưới.</p>
+        <button id="btnClone" class="btn secondary">🧬 Tạo bằng giọng mẫu</button>
+      </div>
+    </details>
+  </section>
+
+  <!-- ================= CỘT PHẢI: hướng dẫn + lịch sử ================= -->
+  <aside class="side">
+    <section class="card">
+      <h2>ℹ️ Engine & cách dùng</h2>
+      <ul class="info">
+        <li>⚙️ Engine: <b>VieNeu-TTS v3 Turbo</b> — 48kHz, on-device.</li>
+        <li>📦 Lần đầu mở web sẽ <b>tự tải model</b> (~1–3GB) từ HuggingFace, cần mạng.</li>
+        <li>⌨️ Văn bản dài tự chia đoạn, tối đa <b>20.000 ký tự/lần</b>.</li>
+        <li>🎚 Tốc độ & cao độ được xử lý hậu kỳ sau khi engine sinh giọng gốc.</li>
+      </ul>
+      <div class="steps">
+        <div><b>1</b> Nhập văn bản</div><div><b>2</b> Chọn giọng + tốc độ</div><div><b>3</b> Chuyển đổi & nghe</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>🕘 Lịch sử</h2><button class="chip ghost" id="btnClearHist">Xóa hết</button></div>
+      <div id="history" class="history"><p class="empty">Chưa có file nào. File bạn tạo sẽ hiện ở đây.</p></div>
+    </section>
+  </aside>
+</main>
+
+<footer class="wrap foot">
+  <span>Made with ❤️ cho cộng đồng TTS Việt • Engine <a href="https://github.com/pnnbao97/VieNeu-TTS" target="_blank" rel="noopener">pnnbao97/VieNeu-TTS</a> (Apache-2.0)</span>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

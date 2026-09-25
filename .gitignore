@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.log
+
+# File am thanh da tao (nang, tai sinh duoc)
+outputs/*.wav
+outputs/*.mp3
+
+# Source engine goc clone tu GitHub (tham khao local, co link goc)
+VieNeu-TTS-source/
+
+# He dieu hanh / IDE
+.DS_Store
+Thumbs.db
+.vscode/
