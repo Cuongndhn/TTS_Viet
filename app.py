@@ -206,6 +206,9 @@ def health():
         "status": "ok" if loaded else ("loading" if loading else "not_loaded"),
         "model": "pnnbao-ump/VieNeu-TTS-v3-Turbo",
         "backend": BACKEND_NAME, "sample_rate": SAMPLE_RATE,
+        # Nơi chạy: "docker" nếu có biến môi trường VIENEU_RUNTIME=docker
+        # (đặt trong docker-compose.yml), ngược lại là "local".
+        "runtime": os.environ.get("VIENEU_RUNTIME", "local"),
         "error": err, "engine_repo": "https://github.com/pnnbao97/VieNeu-TTS",
     }
 

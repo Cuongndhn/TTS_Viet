@@ -76,16 +76,18 @@
       const r = await fetch("/api/health");
       const d = await r.json();
       const dot = modelStatus.querySelector(".dot");
+      // Nhan chay: backend tra ve "docker" khi chay container, "local" khi chay python truc tiep
+      const where = d.runtime === "docker" ? "🐳 Docker" : "💻 Local";
       if (d.status === "ok") {
         dot.className = "dot ok";
-        modelStatusText.textContent = `Model sẵn sàng • ${d.backend} • ${d.sample_rate}Hz`;
+        modelStatusText.textContent = `${where} • Model sẵn sàng • ${d.backend} • ${d.sample_rate}Hz`;
       } else if (d.status === "loading") {
         dot.className = "dot pulse";
-        modelStatusText.textContent = "Đang tải model lần đầu (cần mạng)…";
+        modelStatusText.textContent = `${where} • Đang tải model lần đầu (cần mạng)…`;
         setTimeout(checkHealth, 4000); // hỏi lại sau 4s
       } else {
         dot.className = "dot pulse";
-        modelStatusText.textContent = "Model chưa tải — bấm Chuyển đổi để kích hoạt";
+        modelStatusText.textContent = `${where} • Model chưa tải — bấm Chuyển đổi để kích hoạt`;
       }
     } catch {
       modelStatus.querySelector(".dot").className = "dot err";
